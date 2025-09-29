@@ -6,8 +6,7 @@ int val = 100;
 
 
 int main(void){
-    printf("%d", a);
-    printf("\n%p", val);
+    printf("ваш внутренний возраст: %d\n", 11);
     return 0;
 }
 
