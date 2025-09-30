@@ -7,6 +7,8 @@ int a, b,c,d;
 int *p1 = &a, *p2 = &b, *p3 = &c, *p4 = &d;
 typedef long long int ll;
 
+    uintptr_t pt;
+
 void init_rng(void) {
     time_t curtime;
     time(&curtime);
@@ -18,18 +20,20 @@ void init_rng(void) {
 int gen_rnd_int(void) {
     const ll t = ((ll) rand() * 1000)/RAND_MAX;
     return (int) t;
-
 }
-void swap(int *x, int *y) {
-    int tmp = *x;  // сохраняем адрес, на который указывает первый указатель
-    *x = *y;        // первый указатель теперь указывает туда же, куда указывал второй
-    *y = tmp;
+void swap(int **x, int **y) {
+    *x = (int*)((uintptr_t)(*x) + (uintptr_t)(*y));
+    *y = (int*)((uintptr_t)(*x) - (uintptr_t)(*y));
+    *x = (int*)((uintptr_t)(*x) - (uintptr_t)(*y));
+// uintptr_t - тип данных для указателей ( он беззнаковый) 8 байт
 }
 
 int main(void) {
     init_rng();
     a = gen_rnd_int(); b = gen_rnd_int(); c = gen_rnd_int(); d = gen_rnd_int();
 
+    printf("Переменные:\n%d %d %d %d\n", a,b,c,d);
+    printf("Указатели:\n%d %d %d %d\n", *p1, *p2, *p3, *p4);
     if (*p1 > *p2) swap(&p1, &p2);
     if (*p2 > *p3) swap(&p2, &p3);
     if (*p3 > *p4) swap(&p3, &p4);
@@ -39,6 +43,7 @@ int main(void) {
     printf("Переменные:\n%d %d %d %d\n", a,b,c,d);
     printf("Указатели:\n%d %d %d %d", *p1, *p2, *p3, *p4);
 
+    printf("\n\n%lu",sizeof(uintptr_t));
 
     return 0;
 }
