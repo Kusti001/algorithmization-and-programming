@@ -7,8 +7,22 @@ void swap(int *pv) {
     int t = pv[0]; pv[0] = pv[1]; pv[1]=t;
 }
 
-int Ar[2];
+int Ar[20];
+/*
+Быстрая сортировка:
+Сложность: в среднем случае — O(n log n), В худшем - O(n^2) - когда опорным выбран МАКСИМАЛЬНЫЙ или МИНИМАЛЬНЫЙ элемент массива
++один из самых быстрых алгоритмов сортировки
+-тяжело осознать из-за использования рекурсии
+-глубина рекурсии (n log n) в среднем случае, (n - 1) - когда опорным выбран МАКСИМАЛЬНЫЙ или МИНИМАЛЬНЫЙ элемент в уже отсортированном массиве
 
+Пузырьковая сортировка:
+Сложность: в худшем случае — O(n²), В лучшем - O(n) - когда массив отсортирован изначально
++лёгкое понимание
++константная память
+
+Сходства:
+In-place (без создания доп массивов)
+ */
 void quick_sort(int ar[], int l, int r) {
     if (l < r) {
         int pivot = ar[r];
@@ -21,38 +35,35 @@ void quick_sort(int ar[], int l, int r) {
                 ar[j] = tmp;
             }
         }
-        int tmp = ar[i + 1];
-        ar[i + 1] = ar[r];
+        int pivot_index = i + 1;
+        int tmp = ar[pivot_index];
+        ar[pivot_index] = ar[r];
         ar[r] = tmp;
 
-        int pi = i + 1;
-        quick_sort(ar, l, pi - 1);
-        quick_sort(ar, pi + 1, r);
+        quick_sort(ar, l, pivot_index - 1);
+        quick_sort(ar, pivot_index + 1, r);
     }
 }
 
 double find_median(int ar[], int n) {
-    int count[n];
+    int m1 = 0, m2 = 0;
+
     for (int i = 0; i < n; i++) {
-        count[i] = 0;
+        int count = 0;
         for (int j = 0; j < n; j++) {
             if (ar[j] < ar[i])
-                count[i]++;
+                count++;
+        }
+
+        if (n % 2 == 1 && count == n / 2)
+            return ar[i];
+
+        if (n % 2 == 0) {
+            if (count == n / 2 - 1) m1 = ar[i];
+            if (count == n / 2) m2 = ar[i];
         }
     }
-    if (n % 2 == 1) {
-        int mid = n / 2;
-        for (int i = 0; i < n; i++)
-            if (count[i] == mid)
-                return ar[i];
-    } else {
-        int m1 = -1, m2 = -1;
-        for (int i = 0; i < n; i++) {
-            if (count[i] == n/2 - 1) m1 = i;
-            if (count[i] == n/2) m2 = i;
-        }
-        return (ar[m1] + ar[m2]) / 2.0;
-    }
+    return (m1 + m2) / 2.0;
 }
 
 int main(void) {
