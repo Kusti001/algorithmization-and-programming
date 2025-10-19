@@ -92,7 +92,8 @@ int main(void) {
     } */
 
     quick_sort(Ar, 0, n - 1);
-
+    double med = find_median(Ar, n);
+    printf("\nМедиана: %.2f\n", med);
     printf("\n");
     char ch = ',';
     for (int i = 0; i < n; i++) {
@@ -100,8 +101,8 @@ int main(void) {
         printf("%05d%c", Ar[i],ch);
     }
 
-    double med = find_median(Ar, n);
-    printf("\nМедиана: %.2f\n", med);
+
+
 
     return 0;
 }
