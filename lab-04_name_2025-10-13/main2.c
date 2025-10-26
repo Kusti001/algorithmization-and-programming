@@ -25,32 +25,36 @@ void printArray(int Array[10][10]) {
 
 void createMap(void) {
     srand(time(NULL));
-    // создание препятствий
+    //создание препятствий
     for (int x = 0; x < size; x++) {
         for (int y = 0; y < size; y++) {
             if ((double) rand() / RAND_MAX < wall_percent) {
                 Ar[x][y] = -1;
             } else {
+                Ar[x][y] = rand() % 6 + 1;
             }
         }
     }
 
-    // выбор старта
+    //выбор старта
     while (1) {
         start_x = rand() % size;
         start_y = rand() % size;
-        if (Ar[start_x][start_y] == 0) {
-            Ar[start_x][start_y] = 1; // старт
+        if (Ar[start_x][start_y] != -1) {
+            Ar[start_x][start_y] = 1;
             break;
         }
     }
 
-    // выбор финиша
+    //выбор финиша
     while (1) {
+        time_t curtime;
+        time(&curtime);
+        srand((unsigned int) curtime);
         end_x = rand() % size;
         end_y = rand() % size;
-        if (Ar[end_x][end_y] == 0) {
-            Ar[end_x][end_y] = -2; // финиш
+        if (Ar[end_x][end_y] != -1) {
+            Ar[end_x][end_y] = -2; // Финиш
             break;
         }
     }
@@ -63,23 +67,23 @@ void finddist(void) {
             dist[i][j] = -1;
         }
     }
-// очередь из точек, в которые нужно сходить
-    int queue[100][2]; // хранит пары x, y
-    int front = 0, rear = 0; // front - начало, rear - конец
+
+    int queue[100][2]; // Хранит пары {x, y}
+    int front = 0, rear = 0;
 
     // старт
-    dist[start_x][start_y] = 0; // расстояние от старта = 0
+    dist[start_x][start_y] = 0; // Расстояние от старта = 0
     queue[rear][0] = start_x;
     queue[rear][1] = start_y;
     rear++;
 
-    while (front < rear) { // пока очередь не закончилась, т.е. есть непосещенные клетки
-        // берём клетку с начала очереди
+    while (front < rear) {
+        // Извлекаем текущую клетку
         current_x = queue[front][0];
         current_y = queue[front][1];
-        front++; // очередь сдвинулась вперёд
+        front++;
 
-        // если финиш, заканчиваем функцию
+        // финиш
         if (Ar[current_x][current_y] == -2) {
             break;
         }
@@ -94,8 +98,7 @@ void finddist(void) {
                 dist[ni][nj] = dist[current_x][current_y] + 1;
                 queue[rear][0] = ni;
                 queue[rear][1] = nj;
-                rear++; //добавляем её в конец очереди
-
+                rear++;
             }
         }
     }
@@ -103,21 +106,21 @@ void finddist(void) {
 
 void findpath(void) {
     current_x = end_x;
-    current_y = end_y; //идём с конца
+    current_y = end_y;
     while (Ar[current_x][current_y] != 1) {
         int found = 0;
         for (int d = 0; d < 4; d++) {
             int ni = current_x + directions[d][0];
             int nj = current_y + directions[d][1];
             if ((ni >= 0 && ni < size) && (nj >= 0 && nj < size) && dist[ni][nj] == dist[current_x][current_y] - 1) {
-                path[ni][nj] = 1;
+                path[ni][nj] = 6;
                 current_x = ni;
                 current_y = nj;
-                found = 1; //нашли клетку меньше
-                break; //другие клетки рядом не проверяем
+                found = 1;
+                break;
             }
         }
-        if (!found) break; // если мы НЕ нашли клетку со значением меньше, заканчиваем цикл
+        if (!found) break;
     }
 }
 
@@ -125,15 +128,14 @@ int main(void) {
     createMap();
     //вывод заполненной карты
     printArray(Ar);
-
     finddist();
     printArray(dist);
 
-   // for (int x = 0; x < size; x++) {
-   //     for (int y = 0; y < size; y++) {
-   //         path[x][y] = Ar[x][y];
-   //     }
-   // }
+    for (int x = 0; x < size; x++) {
+        for (int y = 0; y < size; y++) {
+            path[x][y] = Ar[x][y];
+        }
+    }
 
     findpath();
     printArray(path);
