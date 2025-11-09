@@ -1,10 +1,10 @@
-#include <crtdbg.h>
+//#include <crtdbg.h>
 #include <stdio.h>
 #include <stdlib.h>
 #include <string.h>
-#define free(p) _free_dbg(p,_NORMAL_BLOCK)
-#define malloc(p) _malloc_dbg(p,_NORMAL_BLOCK, __FILE__, __LINE__);
-#define _CRTDBG_MAP_ALLOC
+//#define free(p) _free_dbg(p,_NORMAL_BLOCK)
+//#define malloc(p) _malloc_dbg(p,_NORMAL_BLOCK, __FILE__, __LINE__);
+//define _CRTDBG_MAP_ALLOC
 
 struct town {
     struct town *pNext;
@@ -19,7 +19,7 @@ Town *Create(const char *name) {
     size_t len = strlen(name);
     Town *po = (Town *) malloc(sizeof(Town)+len+1);
     if (po == 0) return 0;
-    strncpy_s(po->Name, len + 1, name, len + 1);
+    strlcpy(po->Name, name, len + 1);
     return po;
 }
 
@@ -133,10 +133,21 @@ void SortAllTowns() {
     }
 }
 
-
+void DelAllTowns(void) {
+    if (pFirst == 0) return;
+    Town *po = pFirst;
+    while (po) {
+        Town *pnext = po->pNext;
+        Destroy(po);
+        po = pnext;
+    }
+    pFirst = 0;
+    pLast = 0;
+    printf("All Towns were destroyed");
+}
 
 int main(void) {
-    _CrtSetDbgFlag(_CRTDBG_ALLOC_MEM_DF | _CRTDBG_LEAK_CHECK_DF | _CRTDBG_CHECK_ALWAYS_DF);
+    //_CrtSetDbgFlag(_CRTDBG_ALLOC_MEM_DF | _CRTDBG_LEAK_CHECK_DF | _CRTDBG_CHECK_ALWAYS_DF);
     Town *po = 0;
     PrintAllTowns();
 
@@ -185,23 +196,8 @@ int main(void) {
     DelFromList(po);
     Destroy(po);
     PrintAllTowns();
+
+    DelAllTowns();
 }
 
 
-/*НА ПЯТЕРКУ
- *генерируем двоичное дерево
- *struct BTree{
- *struct Btree * left;
- *struct Btree * right;
- *int val;
- *}.
- *
- *1.Вставка в нужном месте по 1 элементу (проверить, если ли элемент)
- *2.Баланс дерева (слева и справа количество элементов равно или отличается на 1) прогуглить балансировку (не по уровням!!!)
- * ПОВОРОТ ДЕРЕВА без рекурсии!!!
- *
- *
- *
- *
- *
- */
