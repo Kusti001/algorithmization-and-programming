@@ -85,7 +85,7 @@ void btree_to_array(Btree *node, int *arr, int *index) {
 }
 
 Btree* build_balanced(int *arr, int start, int end) {
-    if (start > end) return NULL;
+    if (start > end) return 0;
     int mid = start + (end - start) / 2; //находим индекс медианы - будущей новой вершины дерева
     // создаем НОВУЮ ВЕРШИНУ
     Btree *node = (Btree*)malloc(sizeof(Btree));
@@ -131,24 +131,6 @@ void rebalance_tree() {
 //}
 //
 
-// Простой и понятный вывод с отступами
-void print_tree_simple(Btree *node, int depth) {
-    if (!node) return;
-
-    // Сначала правые ветки (они будут сверху)
-    print_tree_simple(node->right, depth + 1);
-
-    // Отступ для текущего узла
-    for (int i = 0; i < depth; i++) {
-        printf("   ");
-    }
-
-    // Выводим узел
-    printf("%d\n", node->val);
-
-    // Затем левые ветки (они будут снизу)
-    print_tree_simple(node->left, depth + 1);
-}
 
 // Вариант 2 - С стрелочками
 void print_tree_with_arrows(Btree *node, int depth, int is_left) {
@@ -162,7 +144,7 @@ void print_tree_with_arrows(Btree *node, int depth, int is_left) {
         printf("   ");
     }
     if (depth > 0) {
-        printf(is_left ? "\\── " : "/── ");
+        printf(is_left ? "" : "");
     }
 
     printf("%d\n", node->val);

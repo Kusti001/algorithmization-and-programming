@@ -51,39 +51,58 @@ Btree* rebalance_tree(Btree* t) {
     return t;
 }
 
+Btree FULL_REBALANCE(Btree * t) {
+
+    if (!t) return 0; // если пришли в нулевой указатель (вышли из дерева)
+    //cначала идем максимально влево, потом вправо и тд
+    btree_to_array(node->left, arr, index);
+    arr[(*index)++] = node->val; //пришли максимально влево
+    btree_to_array(node->right, arr, index);
+
+
+
+
+}
 //рекурсивная вставка с балансировкой
-Btree *  insert(int n) {
-    Btree *new_node = (Btree *) malloc(sizeof(Btree));
-    new_node->left = new_node->right = NULL;
-    new_node->val = n;
+Btree* insert_iter(Btree *root, int n) {
+    Btree *parent = NULL;
+    Btree *curr = root;
 
-    if (!first) {
-        first = new_node;
-        return first;
-    }
-
-    Btree *t = first;
-    while (1) {
-        if (n < t->val) {
-            if (t->left) {
-                t = t->left;
-            } else {
-                t->left = new_node;
-                return first;
-            }
-        } else if (n > t->val) {
-            if (t->right) {
-                t = t->right;
-            } else {
-                t->right = new_node;
-                return first;
-            }
-        } else {
-            printf("%d ЭЛЕМЕНТ УЖЕ СУЩЕСТВУЕТ\n", n);
-            free(new_node);
-            return first;
+    // 1. Найти место для вставки
+    while (curr != NULL) {
+        parent = curr;
+        if (n < curr->val)
+            curr = curr->left;
+        else if (n > curr->val)
+            curr = curr->right;
+        else {
+            printf("%d ELEMENT ALREADY EXISTS\n", n);
+            return root;
         }
     }
+
+    // 2. Создать узел
+    Btree *new_node = malloc(sizeof(Btree));
+    new_node->val = n;
+    new_node->left = new_node->right = NULL;
+
+    // 3. Если дерево пустое
+    if (parent == NULL)
+        return new_node;
+
+    // 4. Подвесить к родителю
+    if (n < parent->val)
+        parent->left = new_node;
+    else
+        parent->right = new_node;
+
+    // 5. Однократная балансировка только РОДИТЕЛЯ
+    return rebalance_tree(root);
+}
+
+//обертка для вставки(тк вставка возвращает в рекурсии корень поддерева, последнее, что она вернёт - ГЛАВНЫЙ корень, уже после балансировки)
+void insert(int n) {
+    first = insert_iter(first, n);
 }
 
 //самое простое, что смог найти в интеренете
@@ -107,11 +126,20 @@ void PrintTree(Btree *root, int depth) {
 }
 
 int main() {
-    int values[] = {30, 50, 20, 35, 45};
-    int n = sizeof(values)/sizeof(values[0]);
+    //int values[] = {50, 30, 20, 35, 45};
+    //int n = sizeof(values)/sizeof(values[0]);
+//
+    //for (int i = 0; i < n; i++)
+    //    insert(values[i]);
+//
 
-    for (int i = 0; i < n; i++)
-        insert(values[i]);
+
+    insert(50);
+    insert(30);
+    insert(70);
+    insert(1000);
+    insert(200);
+    insert(130);
 
     printf("Final Tree:\n");
     PrintTree(first,0);

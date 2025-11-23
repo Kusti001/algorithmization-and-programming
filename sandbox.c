@@ -1,26 +1,24 @@
+#define GETRANDOM(min,max) \
+((rand()%(int)(((max+1)-(min)))+(min))
 #include <stdio.h>
+#include <stdlib.h>
+#include <time.h>
 
-void cpuid(int code, unsigned int *a, unsigned int *b, unsigned int *c, unsigned int *d) {
-    __asm__ volatile("cpuid"
-                     : "=a"(*a), "=b"(*b), "=c"(*c), "=d"(*d)
-                     : "a"(code));
-}
+#define PRINT_INT(var)\
+printf(#var "=%d " ,var)
 
-int main() {
-    unsigned int a, b, c, d;
+time_t curtime;
 
-    cpuid(0, &a, &b, &c, &d); // запрос 0: vendor string
+int main(void) {
 
-    char vendor[13];
-    ((unsigned int*)vendor)[0] = b;
-    ((unsigned int*)vendor)[1] = d;
-    ((unsigned int*)vendor)[2] = c;
-    vendor[12] = '\0';
 
-    printf("CPU vendor: %s\n", vendor);
+// #var - имя переменной
 
-    cpuid(1, &a, &b, &c, &d); // запрос 1: флаги и модель
-    printf("Processor info: EAX=%08x, EBX=%08x, ECX=%08x, EDX=%08x\n", a, b, c, d);
+int num = 5;
+    PRINT_INT(num); // num = 5
 
     return 0;
+
+
+
 }

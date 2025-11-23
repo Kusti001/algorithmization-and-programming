@@ -1,0 +1,6 @@
+ThisISVar1 // this_is_var_2
+var2 //var2
+Var3 //error
+123 //error
+var99 //var99
+a_b_c_d // aBCD
