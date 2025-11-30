@@ -16,5 +16,6 @@ normal_var
 normalVar
 single
 a
+
 test_string
 testString

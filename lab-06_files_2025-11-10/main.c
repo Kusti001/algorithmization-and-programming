@@ -2,26 +2,28 @@
 #include <stdlib.h>
 #include <string.h>
 
-int is_snake(char *str) {
+int is_snake(const char *str) {
+    int cnt = 0;
     for (int i = 0; str[i] != '\0'; i++) {
         if (str[i] == '_') {
-            return 1;
+            cnt++;
         }
     }
-    return 0;
+    return cnt;
 }
 
-int is_camel(char *str) {
+int is_camel(const char *str) {
+    int cnt = 0;
     for (int i = 0; str[i] != '\0'; i++) {
         if (str[i] >= 'A' && str[i] <= 'Z') {
-            return 1;
+            cnt++;
         }
     }
-    return 0;
+    return cnt;
 }
 
-char *snake_to_camel(char *buffer, int sz, FILE *end_file) {
-    char *new_buffer = malloc(sizeof(char) * (sz + 1));
+char *snake_to_camel(const char *buffer, const int sz) {
+    char *new_buffer = malloc(sizeof(char) * (sz + 1 - is_snake(buffer)));
     int pos = 0;
     int flag = 0;
     for (int i = 0; buffer[i] != '\0'; i++) {
@@ -44,8 +46,8 @@ char *snake_to_camel(char *buffer, int sz, FILE *end_file) {
     return new_buffer;
 }
 
-char *camel_to_snake(char *buffer, int sz, FILE *end_file) {
-    char *new_buffer = malloc(sizeof(char) * (sz * 2));
+char *camel_to_snake(const char *buffer, int sz) {
+    char *new_buffer = malloc(sizeof(char) * (sz +1 + is_camel(buffer)));
     int pos = 0;
     for (int i = 0; buffer[i] != '\0'; i++) {
         if (buffer[i] >= 'A' && buffer[i] <= 'Z') {
@@ -62,7 +64,7 @@ char *camel_to_snake(char *buffer, int sz, FILE *end_file) {
     return new_buffer;
 }
 
-void check_str(char *buffer, int sz, FILE *end_file) {
+void check_str(char *buffer, const int sz, FILE *end_file) {
     //начинается с цифры - ошибка
     if (buffer[0] >= '0' && buffer[0] <= '9') {
         fputs("ERROR\n", end_file);
@@ -83,7 +85,7 @@ void check_str(char *buffer, int sz, FILE *end_file) {
             printf("%s - > ERROR (two types of codestyle)\n",buffer);
             return;
         }
-        char *result = snake_to_camel(buffer, sz, end_file);
+        char *result = snake_to_camel(buffer, sz);
         fputs(result, end_file);
         fputs("\n", end_file);
         printf("%s - > %s (snake_to_camel)\n", buffer, result);
@@ -92,7 +94,7 @@ void check_str(char *buffer, int sz, FILE *end_file) {
     }
 
     if (is_camel(buffer)) {
-        char *result = camel_to_snake(buffer, sz, end_file);
+        char *result = camel_to_snake(buffer, sz);
         fputs(result, end_file);
         fputs("\n", end_file);
         printf("%s - > %s (camel_to_snake)\n", buffer, result);
@@ -104,9 +106,16 @@ void check_str(char *buffer, int sz, FILE *end_file) {
     fputs("\n", end_file);
     printf("%s - > %s (nothing)\n", buffer, buffer);
 }
+int size = 0;
+char * convert_str(char * buffer,FILE *start_file, FILE *end_file, const long start_pos, const long end_pose, const int len) {
+    if (len > size) {
+        size = len;
+        buffer = realloc(buffer, size);
+        if (buffer == NULL) {
+            return NULL;
+        }
+    }
 
-void convert_str(FILE *start_file, FILE *end_file, long start_pos, long end_pose, int len) {
-    char *buffer = malloc(sizeof(char) * (len + 1));
     fseek(start_file, start_pos, SEEK_SET);
     fread(buffer, sizeof(char), len, start_file);
     buffer[len] = '\0';
@@ -114,7 +123,7 @@ void convert_str(FILE *start_file, FILE *end_file, long start_pos, long end_pose
     check_str(buffer, len, end_file);
 
     fseek(start_file, end_pose, SEEK_SET);
-    free(buffer);
+    return buffer;
 }
 
 int main() {
@@ -156,17 +165,21 @@ int main() {
     end_pos = ftell(start_file);
     printf(" start=%ld, end=%ld, length=%ld\n",start_pos, end_pos, end_pos - start_pos);
 */
-
+    char *buffer = malloc(sizeof(char) * (2));
+    if (buffer == NULL) {
+        return 1;
+    }
     while ((c = fgetc(start_file)) != EOF) {
         if (c == '\n') {
             end_pos = ftell(start_file);
-            convert_str(start_file, end_file, start_pos, end_pos, end_pos - start_pos - 2);
+            buffer = convert_str(buffer,start_file, end_file, start_pos, end_pos, end_pos - start_pos - 1);
             start_pos = end_pos;
         }
     }
     end_pos = ftell(start_file);
-    convert_str(start_file, end_file, start_pos, end_pos, end_pos - start_pos);
+    buffer = convert_str(buffer,start_file, end_file, start_pos, end_pos, end_pos - start_pos);
 
+    free(buffer);
     printf("\nfile end");
 
     fclose(start_file);
