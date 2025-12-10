@@ -1,4 +1,4 @@
-#include <stdio.h>
+﻿#include <stdio.h>
 #include <stdlib.h>
 
 int size = 2;
@@ -111,11 +111,13 @@ char * convert_str(char * buffer,FILE *start_file, FILE *end_file, const long st
     if (len > size) { //если текущий размер строки больше, увеличиваем буфер
         size = len + 1;//новый размер
         char *new_buffer = realloc(buffer, size);//переоткрываем буфер
-        if (new_buffer == NULL){//если не нашлось памяти
-            free(buffer);
-            return NULL;
+        if (new_buffer == NULL){//если не нашлось памяти НЕПРЕРЫВНОЙ
+            free(buffer); //освобождаем текущий
+            buffer = (char*)malloc(sizeof(char) * size); //октрываем НОВЫЙ
         }
-        buffer = new_buffer;
+        else {
+            buffer = new_buffer;
+        }
     }
 
     fseek(start_file, start_pos, SEEK_SET); //ставим картеку на начало слова
@@ -150,14 +152,7 @@ int main() {
     while ((c = fgetc(start_file)) != EOF) {
         if (c == '\n') { //если пришли в конец строки
             end_pos = ftell(start_file); //записываем позицию каретки
-            buffer = convert_str(buffer,start_file, end_file, start_pos, end_pos, end_pos - start_pos - 2); //обрабатываем
-
-            if (!buffer) { //если не получилось открыть
-
-                fclose(start_file);
-                fclose(end_file);
-                return 1;
-            }
+            buffer = convert_str(buffer,start_file, end_file, start_pos, end_pos, end_pos - start_pos - 1); //обрабатываем
 
             start_pos = end_pos;//теперь конец - начало
 
@@ -168,7 +163,7 @@ int main() {
     buffer = convert_str(buffer,start_file, end_file, start_pos, end_pos, end_pos - start_pos);
 
     free(buffer);
-    printf("\nfile end");
+    printf("\nfile end\n");
 
     fclose(start_file);
     fclose(end_file);
